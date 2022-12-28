@@ -2,6 +2,7 @@ use colored::*;
 use image::{imageops::FilterType::*, GenericImageView, Pixel};
 use std::path::PathBuf;
 use structopt::{clap::arg_enum, StructOpt};
+use itertools::Itertools;
 
 const BRIGHTNESS_CHARS: [char; 65] = [
     '`', '^', '"', ',', ':', ';', 'I', 'l', '!', 'i', '~', '+', '_', '-', '?', ']', '[', '}', '{',
@@ -78,13 +79,10 @@ fn main() -> Result<(), image::ImageError> {
         })
         .collect::<Vec<ColoredString>>();
 
-    // Can I combine this into one iter?
-    for line in ascii_image.chunks(image.width() as usize) {
-        for char in line {
-            print!("{0}{0}", char);
-        }
-        println!();
-    }
+    ascii_image
+    .chunks(image.width() as usize)
+    .map(|line| line.iter().map(|c| format!("{0}{0}", c)).join(""))
+    .for_each(|line| println!("{}", line));
 
     Ok(())
 }
